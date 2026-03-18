@@ -6,7 +6,11 @@ This lab is designed to simulate a multi‑site enterprise network using a hub�
 Technologies Used
 
 Proxmox VE – Virtualization platform hosting the lab environment
+
 EVE‑NG – Network emulation platform for multi‑vendor topologies
+
 Cisco IOL – Lightweight Cisco routing and switching images
+
 FortiGate (FortiOS 7.0.15) – Firewall, routing, VPN, and security policies.
+
 FortiManager – Centralized management and policy control
