@@ -14,3 +14,7 @@ Cisco IOL – Lightweight Cisco routing and switching images
 FortiGate (FortiOS 7.0.15) – Firewall, routing, VPN, and security policies.
 
 FortiManager – Centralized management and policy control
+
+
+<img width="1528" height="785" alt="image" src="https://github.com/user-attachments/assets/a167ed57-4203-4931-aeb9-fd3f1aabb1f1" />
+
