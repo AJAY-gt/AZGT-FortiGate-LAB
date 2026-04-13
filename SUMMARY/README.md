@@ -9,12 +9,12 @@ sites, and a shared internet segment.
 
 ## Topology Summary
 
-| Role | Device | Loopback | WAN Interface |
-|---|---|---|---|
-| Hub 1 | HUBR1 | L0: 10.1.1.1 | e0/2 — 10.10.30.4/30 WAN1 |
-| Hub 2 | HUBR2 | L0: 10.1.1.2 | e0/2 — 10.10.30.12/30 WAN1 |
-| Spoke 1 | SITER1 | L0: 10.1.1.3 | e0/2 — 10.10.30.20/30 WAN1 |
-| Spoke 2 | SITER2 | L0: 10.1.1.4 | e0/2 — 10.10.30.28/30 WAN1 |
+| Role | Device | Loopback |
+|---|---|---|
+| Hub 1 | HUBFG1 | L0: 172.28.255.253 |
+| Hub 2 | HUBFG2 | L0: 172.28.255.252 |
+| Spoke 1 | SITEFG1 | L0: 172.28.0.1 |
+| Spoke 2 | SITEFG2 | L0: 171.28.0.2 | 
 
 ---
 
@@ -50,7 +50,7 @@ sites, and a shared internet segment.
 ---
 
 ## Management
-- **FortiManager** connected via **port1** to the internet segment
+- **FortiManager** connected via **port3** to connect via local LAN
 - Manages all FortiGate devices centrally
 
 ---
@@ -64,5 +64,3 @@ sites, and a shared internet segment.
 
 ---
 
-## Diagram
-![Topology](Diagrams/Underlay-Diagram/topology.png)
