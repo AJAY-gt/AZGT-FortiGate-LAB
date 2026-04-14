@@ -32,6 +32,6 @@ sites, and a shared internet segment.
 - [ ] Validate BGP routing over overlay tunne
   
   
-> _Note:The LAN architecture limits configuration on hub hosts, so spokes must manually configure the IP address for each hub host during failover.
+>Note:The LAN architecture limits configuration on hub hosts, so spokes must manually configure the IP address for each hub host during failover.
 ---
 
