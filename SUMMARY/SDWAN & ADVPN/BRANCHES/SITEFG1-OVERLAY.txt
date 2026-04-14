@@ -1,0 +1,479 @@
+SITEFG1 # config router bgp
+
+SITEFG1 (bgp) # show
+config router bgp
+    set as 65001
+    set router-id 172.28.0.1
+    set keepalive-timer 10
+    set holdtime-timer 30
+    set client-to-client-reflection disable
+    set recursive-next-hop enable
+    set graceful-restart enable
+    config neighbor
+        edit "172.29.31.253"
+            set advertisement-interval 1
+            set activate6 disable
+            set capability-graceful-restart enable
+            set link-down-failover enable
+            set next-hop-self enable
+            set soft-reconfiguration enable
+            set interface "HUBFG1-VPN1A"
+            set remote-as 65001
+            set route-map-in "LP200-HUB1-WAN1"
+            set route-map-out "LP200-HUB1-WAN1"
+            set connect-timer 10
+            set additional-path receive
+        next
+        edit "172.29.63.253"
+            set advertisement-interval 1
+            set activate6 disable
+            set capability-graceful-restart enable
+            set link-down-failover enable
+            set next-hop-self enable
+            set soft-reconfiguration enable
+            set interface "HUBFG1-VPN2B"
+            set remote-as 65001
+            set route-map-in "LP150-HUB1-WAN2"
+            set route-map-out "LP150-HUB1-WAN2"
+            set connect-timer 10
+            set additional-path receive
+        next
+        edit "172.29.95.253"
+            set advertisement-interval 1
+            set activate6 disable
+            set capability-graceful-restart enable
+            set link-down-failover enable
+            set next-hop-self enable
+            set soft-reconfiguration enable
+            set interface "HUBFG2-VPN1A"
+            set remote-as 65001
+            set route-map-in "LP120-HUB2-WAN1"
+            set route-map-out "LP120-HUB2-WAN1"
+            set connect-timer 10
+            set additional-path receive
+        next
+        edit "172.29.127.253"
+            set advertisement-interval 1
+            set activate6 disable
+            set capability-graceful-restart enable
+            set link-down-failover enable
+            set next-hop-self enable
+            set soft-reconfiguration enable
+            set interface "HUBFG2-VPN2B"
+            set remote-as 65001
+            set route-map-in "LP90-HUB2-WAN2"
+            set route-map-out "LP90-HUB2-WAN2"
+            set connect-timer 10
+            set additional-path receive
+        next
+    end
+    config network
+        edit 2
+            set prefix 172.28.0.1 255.255.255.255
+        next
+        edit 1
+            set prefix 192.168.93.0 255.255.255.0
+        next
+    end
+    config network6
+        edit 1
+            set prefix6 ::/128
+        next
+    end
+    config redistribute "connected"
+    end
+    config redistribute "rip"
+    end
+    config redistribute "ospf"
+    end
+    config redistribute "static"
+    end
+    config redistribute "isis"
+    end
+    config redistribute6 "connected"
+    end
+    config redistribute6 "rip"
+    end
+    config redistribute6 "ospf"
+    end
+    config redistribute6 "static"
+    end
+    config redistribute6 "isis"
+    end
+end
+
+SITEFG1 (bgp) # end
+
+SITEFG1 # config router route-map
+
+SITEFG1 (route-map) # show
+config router route-map
+    edit "RFC1918"
+        set comments "Local Pref 90"
+        config rule
+            edit 1
+                set match-ip-address "RFC1918"
+                set set-local-preference 90
+            next
+        end
+    next
+    edit "LP200-HUB1-WAN1"
+        config rule
+            edit 1
+                set set-local-preference 200
+            next
+        end
+    next
+    edit "LP150-HUB1-WAN2"
+        config rule
+            edit 1
+                set set-local-preference 150
+            next
+        end
+    next
+    edit "LP120-HUB2-WAN1"
+        config rule
+            edit 1
+                set set-local-preference 120
+            next
+        end
+    next
+    edit "LP90-HUB2-WAN2"
+        config rule
+            edit 1
+                set set-local-preference 90
+            next
+        end
+    next
+end
+
+SITEFG1 (route-map) # end
+
+SITEFG1 # config system sdwan
+
+SITEFG1 (sdwan) # show
+config system sdwan
+    set status enable
+    config zone
+        edit "virtual-wan-link"
+        next
+        edit "INET"
+        next
+        edit "ADVPN"
+        next
+    end
+    config members
+        edit 1
+            set interface "port1"
+            set zone "INET"
+            set gateway 10.10.30.21
+            set priority 10
+        next
+        edit 2
+            set interface "port2"
+            set zone "INET"
+            set gateway 10.10.30.25
+            set priority 20
+        next
+        edit 3
+            set interface "HUBFG1-VPN1A"
+            set zone "ADVPN"
+            set priority 30
+        next
+        edit 4
+            set interface "HUBFG1-VPN2B"
+            set zone "ADVPN"
+            set priority 40
+        next
+        edit 5
+            set interface "HUBFG2-VPN1A"
+            set zone "ADVPN"
+            set priority 50
+        next
+        edit 6
+            set interface "HUBFG2-VPN2B"
+            set zone "ADVPN"
+            set priority 60
+        next
+    end
+    config health-check
+        edit "Default_DNS"
+            set system-dns enable
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_Office_365"
+            set server "www.office.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_Gmail"
+            set server "gmail.com"
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 2
+                next
+            end
+        next
+        edit "Default_AWS"
+            set server "aws.amazon.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_Google Search"
+            set server "www.google.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_FortiGuard"
+            set server "fortiguard.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "PingGoogle"
+            set server "8.8.8.8"
+            set update-static-route disable
+            set members 1 2
+            config sla
+                edit 1
+                    set latency-threshold 500
+                    set jitter-threshold 50
+                    set packetloss-threshold 20
+                next
+            end
+        next
+        edit "PINGHUB2"
+            set server "172.28.255.252"
+            set detect-mode prefer-passive
+            set update-static-route disable
+            set members 5 6
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "PINGHUB1"
+            set server "172.28.255.253"
+            set detect-mode prefer-passive
+            set update-static-route disable
+            set members 3 4
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 10
+                next
+            end
+        next
+    end
+    config service
+        edit 3
+            set name "Internal"
+            set mode sla
+            set dst "RFC1918"
+            set src "RFC1918"
+            config sla
+                edit "PINGHUB1"
+                    set id 1
+                next
+                edit "PINGHUB2"
+                    set id 1
+                next
+            end
+            set priority-zone "ADVPN"
+        next
+        edit 1
+            set name "Internet"
+            set mode sla
+            set dst "all"
+            set src "all"
+            config sla
+                edit "PingGoogle"
+                    set id 1
+                next
+            end
+            set priority-zone "INET"
+        next
+        edit 2
+            set name "Internet_YouTube"
+            set mode sla
+            set src "all"
+            set internet-service enable
+            set internet-service-app-ctrl 31077 33321 41598 31076 33104 23397 30201 16420 17396 38569 25564
+            config sla
+                edit "PingGoogle"
+                    set id 1
+                next
+            end
+            set priority-members 2 1
+        next
+    end
+end
+
+SITEFG1 (sdwan) # end
+
+SITEFG1 # config vpn ipsec phase1-interface
+
+SITEFG1 (phase1-interface) # show
+config vpn ipsec phase1-interface
+    edit "HUBFG1-VPN1A"
+        set interface "port1"
+        set ike-version 2
+        set peertype any
+        set net-device enable
+        set mode-cfg enable
+        set proposal des-sha256
+        set add-route disable
+        set localid "Spoke1"
+        set comments "VPN: HUBFG1-VPN1A [Created by IPSEC Template]"
+        set idle-timeout enable
+        set auto-discovery-receiver enable
+        set auto-discovery-shortcuts dependent
+        set network-overlay enable
+        set network-id 1
+        set remote-gw 10.10.30.6
+        set psksecret ENC 0+U3ZH01WCMxxk4yuWstjaWRGXgcVGm1SpLL8qrWFYY7lmf7cqkMNK/Jhi5/1yP7oWS+uuENyMx3PSIA+GYknHG+kjvCRkuE7uAw6VzJEhlYD
+0D5d2FFuMQmMTe7RP+Z/Wzm4pBArnsq3TvTRF7yy6VtWtvFCz/TFYAfNRp/3113naNNPp3oJaQwjDaBYxhOkfdAZw==
+    next
+    edit "HUBFG1-VPN2B"
+        set interface "port2"
+        set ike-version 2
+        set peertype any
+        set net-device enable
+        set mode-cfg enable
+        set proposal des-sha256
+        set add-route disable
+        set localid "Spoke1"
+        set comments "VPN: HUBFG1-VPN2B [Created by IPSEC Template]"
+        set idle-timeout enable
+        set auto-discovery-receiver enable
+        set auto-discovery-shortcuts dependent
+        set network-overlay enable
+        set network-id 2
+        set remote-gw 10.10.30.6
+        set psksecret ENC TzVlKKTSDv0CED7C5pOzLN9pCRGtEIs38suEkG6xRhW0EuKHTIaA7oLyVqciNJuQVKoKaqIvlmhrZHS9Kajvw3OIRLUCq7c6J8RgwqAZqh4eO
+POLVbEKbaKA3TcvLJTaQHuKPh9Y1v1KlM/yIx3kn/wFTAAQwxKsbJf5lX8JFyLnqyf4GWqe1dUMEqp/P3Y+jRZzMw==
+    next
+    edit "HUBFG2-VPN1A"
+        set interface "port1"
+        set ike-version 2
+        set peertype any
+        set net-device enable
+        set mode-cfg enable
+        set proposal des-sha256
+        set add-route disable
+        set localid "Spoke1"
+        set comments "VPN: HUBFG2-VPN1A [Created by IPSEC Template]"
+        set idle-timeout enable
+        set auto-discovery-receiver enable
+        set auto-discovery-shortcuts dependent
+        set network-overlay enable
+        set network-id 3
+        set remote-gw 10.10.30.14
+        set psksecret ENC wQ1EnEpU6bCe8OrhJspFaJNurbS5v86GCcPa+jI+3MBs0ei4Pq15ktblShjDlWNavsUZk5IWCNZkcX6Nl/wvQJuomTRufJjhjhNGlzoqeKRw3
+xMhSjzrsaASdNAQu6VxQ6+Ljc+VwuLKMyHr2Fz2JEvXpjUG2TQhDwFx7+kodFTUV8e2u+JR6jBcPOwdBTKfTGslXg==
+    next
+    edit "HUBFG2-VPN2B"
+        set interface "port2"
+        set ike-version 2
+        set peertype any
+        set net-device enable
+        set mode-cfg enable
+        set proposal des-sha256
+        set add-route disable
+        set localid "Spoke1"
+        set comments "VPN: HUBFG2-VPN2B [Created by IPSEC Template]"
+        set idle-timeout enable
+        set auto-discovery-receiver enable
+        set auto-discovery-shortcuts dependent
+        set network-overlay enable
+        set network-id 4
+        set remote-gw 10.10.30.14
+        set psksecret ENC 2RbLXDZxEe1ZATRh1YRlRp151Ee52EEEXh5koKTqJR3m0V4SYtVqy7DbKno+MXwiLXLe4ZExii+RO16L17HExO2JMeUUzcKVcqiNPS96SXPHL
+C47F7psrpbeRrj677WGk4gNConi38UVhz9I/Kmb7JWLmdaZ2rwiH56r0DSa2KzrtYEUVFHvdQsvbrTF/EEfwsuJwg==
+    next
+end
+
+SITEFG1 (phase1-interface) # end
+
+SITEFG1 # config vpn ipsec phase2-interface
+
+SITEFG1 (phase2-interface) # show
+config vpn ipsec phase2-interface
+    edit "HUBFG1-VPN1A"
+        set phase1name "HUBFG1-VPN1A"
+        set proposal des-sha256
+        set comments "VPN: HUBFG1-VPN1A [Created by IPSEC Template]"
+    next
+    edit "HUBFG1-VPN2B"
+        set phase1name "HUBFG1-VPN2B"
+        set proposal des-sha256
+        set comments "VPN: HUBFG1-VPN2B [Created by IPSEC Template]"
+    next
+    edit "HUBFG2-VPN1A"
+        set phase1name "HUBFG2-VPN1A"
+        set proposal des-sha256
+        set comments "VPN: HUBFG2-VPN1A [Created by IPSEC Template]"
+    next
+    edit "HUBFG2-VPN2B"
+        set phase1name "HUBFG2-VPN2B"
+        set proposal des-sha256
+        set comments "VPN: HUBFG2-VPN2B [Created by IPSEC Template]"
+    next
+end
+
+SITEFG1 (phase2-interface) # end
+
+SITEFG1 #
