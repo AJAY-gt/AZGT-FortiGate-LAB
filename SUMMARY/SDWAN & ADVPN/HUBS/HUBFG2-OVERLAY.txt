@@ -1,0 +1,328 @@
+HUBFG2 # config router bgp
+
+HUBFG2 (bgp) # show
+config router bgp
+    set as 65001
+    set router-id 172.28.255.252
+    set keepalive-timer 10
+    set holdtime-timer 30
+    set enforce-first-as disable
+    set graceful-restart enable
+    config neighbor-group
+        edit "VPN1A"
+            set capability-graceful-restart enable
+            set next-hop-self enable
+            set soft-reconfiguration enable
+            set remote-as 65001
+            set route-map-in "VPN1A-IN-LP120"
+            set route-map-out "VPN1A-IN-LP120"
+            set route-reflector-client enable
+        next
+        edit "VPN2B"
+            set capability-graceful-restart enable
+            set next-hop-self enable
+            set soft-reconfiguration enable
+            set remote-as 65001
+            set route-map-in "VPN2B-IN-LP90"
+            set route-map-out "VPN2B-IN-LP90"
+            set route-reflector-client enable
+        next
+    end
+    config neighbor-range
+        edit 1
+            set prefix 172.29.64.0 255.255.224.0
+            set neighbor-group "VPN1A"
+        next
+        edit 2
+            set prefix 172.29.96.0 255.255.224.0
+            set neighbor-group "VPN2B"
+        next
+    end
+    config network
+        edit 1
+            set prefix 172.29.64.0 255.255.224.0
+        next
+        edit 2
+            set prefix 172.29.96.0 255.255.224.0
+        next
+        edit 3
+            set prefix 172.28.255.252 255.255.255.255
+        next
+        edit 4
+            set prefix 192.168.91.0 255.255.255.0
+        next
+    end
+    config network6
+        edit 1
+            set prefix6 ::/128
+        next
+    end
+    config redistribute "connected"
+    end
+    config redistribute "rip"
+    end
+    config redistribute "ospf"
+    end
+    config redistribute "static"
+    end
+    config redistribute "isis"
+    end
+    config redistribute6 "connected"
+    end
+    config redistribute6 "rip"
+    end
+    config redistribute6 "ospf"
+    end
+    config redistribute6 "static"
+    end
+    config redistribute6 "isis"
+    end
+end
+
+HUBFG2 (bgp) # end
+
+HUBFG2 # config router route-map
+
+HUBFG2 (route-map) # show
+config router route-map
+    edit "RFC1918"
+        set comments "Local Pref 90"
+        config rule
+            edit 1
+                set match-ip-address "RFC1918"
+                set set-local-preference 90
+            next
+        end
+    next
+    edit "VPN1A-IN-LP200"
+        config rule
+            edit 1
+                set set-local-preference 200
+            next
+        end
+    next
+    edit "VPN2B-IN-LP150"
+        config rule
+            edit 1
+                set set-local-preference 150
+            next
+        end
+    next
+    edit "VPN1A-IN-LP120"
+        config rule
+            edit 1
+                set set-local-preference 120
+            next
+        end
+    next
+    edit "VPN2B-IN-LP90"
+        config rule
+            edit 1
+                set set-local-preference 120
+            next
+        end
+    next
+end
+
+HUBFG2 (route-map) # end
+
+HUBFG2 # config system sdwan
+
+HUBFG2 (sdwan) # show
+config system sdwan
+    set status enable
+    config zone
+        edit "virtual-wan-link"
+        next
+        edit "INET"
+        next
+        edit "ADVPN"
+        next
+    end
+    config members
+        edit 1
+            set interface "port1"
+            set zone "INET"
+            set gateway 10.10.30.13
+            set priority 10
+        next
+        edit 2
+            set interface "port2"
+            set zone "INET"
+            set gateway 10.10.30.17
+            set priority 20
+        next
+        edit 3
+            set interface "VPN1A"
+            set zone "ADVPN"
+            set priority 30
+        next
+        edit 4
+            set interface "VPN2B"
+            set zone "ADVPN"
+            set priority 40
+        next
+    end
+    config health-check
+        edit "Default_DNS"
+            set system-dns enable
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_Office_365"
+            set server "www.office.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_Gmail"
+            set server "gmail.com"
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 2
+                next
+            end
+        next
+        edit "Default_AWS"
+            set server "aws.amazon.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_Google Search"
+            set server "www.google.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "Default_FortiGuard"
+            set server "fortiguard.com"
+            set protocol http
+            set interval 1000
+            set probe-timeout 1000
+            set recoverytime 10
+            config sla
+                edit 1
+                    set latency-threshold 250
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+        edit "PingGoogle"
+            set server "8.8.8.8"
+            set update-static-route disable
+            set members 1
+            config sla
+                edit 1
+                    set latency-threshold 500
+                    set jitter-threshold 50
+                    set packetloss-threshold 10
+                next
+            end
+        next
+    end
+end
+
+HUBFG2 (sdwan) # end
+
+HUBFG2 # config vpn ipsec phase1-interface
+
+HUBFG2 (phase1-interface) # show
+config vpn ipsec phase1-interface
+    edit "VPN1A"
+        set type dynamic
+        set interface "port1"
+        set ike-version 2
+        set keylife 43200
+        set peertype any
+        set net-device disable
+        set mode-cfg enable
+        set proposal des-sha256
+        set add-route disable
+        set dpd on-idle
+        set auto-discovery-sender enable
+        set network-overlay enable
+        set network-id 3
+        set ipv4-start-ip 172.29.64.1
+        set ipv4-end-ip 172.29.95.252
+        set ipv4-netmask 255.255.224.0
+        set psksecret ENC G6cH/MliT/PFS1sf2AxF0oDkzC5JPUMLMVtOuzTaf3rCCiSFQfI4X5FKamU+CkQWWGI3rqQdEm2QOZEHU8GOsRsrjm6VeUcXfXUyrR8j+0NSU
+ACeqhbuBE3xyFPplq2Wt5LQM1XqdairN3gNoPvtMpG0+uKFJC+YSFtTzODRXX5rN2KzuAuKrqI7lH3ypBBqSFSXFg==
+        set dpd-retryinterval 60
+    next
+    edit "VPN2B"
+        set type dynamic
+        set interface "port1"
+        set ike-version 2
+        set peertype any
+        set net-device disable
+        set mode-cfg enable
+        set proposal des-sha256
+        set add-route disable
+        set dpd on-idle
+        set auto-discovery-sender enable
+        set network-overlay enable
+        set network-id 4
+        set ipv4-start-ip 172.29.96.1
+        set ipv4-end-ip 172.29.127.252
+        set ipv4-netmask 255.255.224.0
+        set psksecret ENC JFRrgUkrUDcXkhpjiIv3uCsglS/CJqM4owJefh61HA142CmOubts7NVhcr7eQH7gY5F+xtMgbLDW3wTUrtv53jYne6zp/ZFjxb3O2gnBdEsy8
+ZX4eQLsjk8O0iufZpTlO8O22hO6Tgx+2X3CE/27HA4smeF92fpRTdxrFZBOiFkmV09lYEy8JSfpkzMJrWB4XucApQ==
+        set dpd-retryinterval 60
+    next
+end
+
+HUBFG2 (phase1-interface) # end
+
+HUBFG2 # config vpn ipsec phase2-interface
+
+HUBFG2 (phase2-interface) # show
+config vpn ipsec phase2-interface
+    edit "VPN1A"
+        set phase1name "VPN1A"
+        set proposal des-sha256
+    next
+    edit "VPN2B"
+        set phase1name "VPN2B"
+        set proposal des-sha256
+    next
+end
+
