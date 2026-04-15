@@ -1,0 +1,62 @@
+SITEFG2 # config system automation-trigger
+
+SITEFG2 (automation-trigger) # edit WhenVPN1A\ is\ up
+
+SITEFG2 (WhenVPN1A is up) # show
+config system automation-trigger
+    edit "WhenVPN1A is up"
+        set event-type event-log
+        set logid 37138
+        config fields
+            edit 1
+                set name "vpntunnel"
+                set value "HUBFG1-VPN1A"
+            next
+            edit 2
+                set name "action"
+                set value "tunnel-up"
+            next
+        end
+    next
+end
+
+SITEFG2 (WhenVPN1A is up) # end
+
+SITEFG2 # config system automation-action
+
+SITEFG2 (automation-action) # edit FlushTunnel
+
+SITEFG2 (FlushTunnel) # show
+config system automation-action
+    edit "FlushTunnel"
+        set action-type cli-script
+        set script "diagnose vpn ike gateway flush name HUBFG1-VP
+N2B
+diagnose vpn tunnel flush name HUBFG1-VPN2B"
+        set accprofile "super_admin"
+    next
+end
+
+SITEFG2 (FlushTunnel) # end
+
+SITEFG2 # config system automation-stitch
+
+SITEFG2 (automation-stitch) # edit FailbackShortcut
+
+SITEFG2 (FailbackShortcut) # show
+config system automation-stitch
+    edit "FailbackShortcut"
+        set trigger "WhenVPN1A is up"
+        config actions
+            edit 1
+                set action "FlushTunnel"
+                set delay 10
+                set required enable
+            next
+        end
+    next
+end
+
+SITEFG2 (FailbackShortcut) # end
+
+SITEFG2 #
