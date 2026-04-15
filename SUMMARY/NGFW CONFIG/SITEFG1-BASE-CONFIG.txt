@@ -1,0 +1,306 @@
+SITEFG1 # config system interface
+
+SITEFG1 (interface) # show
+config system interface
+    edit "port1"
+        set vdom "root"
+        set ip 10.10.30.22 255.255.255.252
+        set allowaccess ping https ssh fgfm
+        set type physical
+        set alias "WAN1"
+        set snmp-index 1
+    next
+    edit "port2"
+        set vdom "root"
+        set ip 10.10.30.26 255.255.255.252
+        set allowaccess ping https ssh
+        set type physical
+        set alias "WAN2"
+        set snmp-index 2
+    next
+    edit "port3"
+        set vdom "root"
+        set ip 10.10.10.93 255.255.255.0
+        set allowaccess ssh snmp http
+        set type physical
+        set alias "MGMT"
+        set snmp-index 3
+    next
+    edit "port4"
+        set vdom "root"
+        set ip 192.168.93.254 255.255.255.0
+        set allowaccess ping fabric
+        set type physical
+        set alias "LAN"
+        set snmp-index 4
+    next
+    edit "naf.root"
+        set vdom "root"
+        set type tunnel
+        set src-check disable
+        set snmp-index 5
+    next
+    edit "l2t.root"
+        set vdom "root"
+        set type tunnel
+        set snmp-index 6
+    next
+    edit "ssl.root"
+        set vdom "root"
+        set type tunnel
+        set alias "SSL VPN interface"
+        set snmp-index 7
+    next
+    edit "fortilink"
+        set vdom "root"
+        set ip 10.255.1.1 255.255.255.0
+        set allowaccess ping fabric
+        set type aggregate
+        set lldp-reception enable
+        set lldp-transmission enable
+        set snmp-index 8
+    next
+    edit "HUBFG1-VPN1A"
+        set vdom "root"
+        set allowaccess ping
+        set type tunnel
+        set snmp-index 10
+        set interface "port1"
+    next
+    edit "Spoke1-L0"
+        set vdom "root"
+        set ip 172.28.0.1 255.255.255.255
+        set allowaccess ping https snmp
+        set type loopback
+        set role lan
+        set snmp-index 9
+    next
+    edit "HUBFG1-VPN2B"
+        set vdom "root"
+        set allowaccess ping
+        set type tunnel
+        set snmp-index 11
+        set interface "port2"
+    next
+    edit "HUBFG2-VPN1A"
+        set vdom "root"
+        set allowaccess ping
+        set type tunnel
+        set snmp-index 12
+        set interface "port1"
+    next
+    edit "HUBFG2-VPN2B"
+        set vdom "root"
+        set allowaccess ping
+        set type tunnel
+        set snmp-index 13
+        set interface "port2"
+    next
+end
+
+SITEFG1 (interface) # end
+
+SITEFG1 # config system global
+
+SITEFG1 (global) # show
+config system global
+    set admintimeout 20
+    set alias "FortiGate-VM64-KVM"
+    set gui-theme dark-matter
+    set hostname "SITEFG1"
+    set timezone 65
+end
+
+SITEFG1 (global) # end
+
+SITEFG1 # config system dhcp server
+
+SITEFG1 (server) # show
+config system dhcp server
+    edit 1
+        set dns-service default
+        set default-gateway 192.168.93.254
+        set netmask 255.255.255.0
+        set interface "port4"
+        config ip-range
+            edit 1
+                set start-ip 192.168.93.100
+                set end-ip 192.168.93.200
+            next
+        end
+    next
+end
+
+SITEFG1 (server) # end
+
+SITEFG1 # config system dns
+
+SITEFG1 (dns) # show
+config system dns
+    set primary 96.45.45.45
+    set secondary 96.45.46.46
+end
+
+SITEFG1 (dns) # end
+
+SITEFG1 # config system admin
+
+SITEFG1 (admin) # show
+config system admin
+    edit "admin"
+        set trusthost1 10.20.20.0 255.255.255.0
+        set trusthost2 10.10.10.0 255.255.255.0
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC SH2HTbI0g9q4KxTFmB9/ufXWdJws6Xyt8dy/hap5
+11Qe4lUbnn413y0QqGaZjc=
+    next
+end
+
+SITEFG1 (admin) # end
+
+SITEFG1 # config firewall profile-group
+
+SITEFG1 (profile-group) # show
+config firewall profile-group
+    edit "Default-ProfileGroup"
+        set av-profile "default"
+        set webfilter-profile "default"
+        set dnsfilter-profile "default"
+        set ips-sensor "all_default"
+        set application-list "default"
+    next
+end
+
+SITEFG1 (profile-group) # end
+
+SITEFG1 # config firewall address
+
+SITEFG1 (address) # show
+config firewall address
+    edit "all"
+        set uuid 16c5f856-2f26-51f1-34c3-e22c3b251797
+    next
+    edit "FIREWALL_AUTH_PORTAL_ADDRESS"
+        set uuid 3a8425e2-abdc-51f0-5c0e-b1808ef37b24
+    next
+    edit "FABRIC_DEVICE"
+        set uuid 3a8426e6-abdc-51f0-7ce5-f8d3f92489ea
+        set comment "IPv4 addresses of Fabric Devices."
+    next
+    edit "SSLVPN_TUNNEL_ADDR1"
+        set uuid 3a84991e-abdc-51f0-0a74-183e0f77a784
+        set type iprange
+        set start-ip 10.212.134.200
+        set end-ip 10.212.134.210
+    next
+    edit "FCTEMS_ALL_FORTICLOUD_SERVERS"
+        set uuid 6279e2ee-abdc-51f0-49b8-b57b040f5076
+        set type dynamic
+        set sub-type ems-tag
+    next
+    edit "Spoke1-L0 address"
+        set uuid de392d6e-b26b-51f0-8dd3-cb911d3b308e
+        set type interface-subnet
+        set subnet 172.28.0.1 255.255.255.255
+        set interface "Spoke1-L0"
+    next
+    edit "RFC1918-10"
+        set uuid 16c70c32-2f26-51f1-3645-cb887502b503
+        set subnet 10.0.0.0 255.0.0.0
+    next
+    edit "RFC198-172"
+        set uuid 32f0007a-e256-51f0-3fcf-75fad96de653
+        set subnet 172.16.0.0 255.240.0.0
+    next
+    edit "RFC1918-192"
+        set uuid 16c77550-2f26-51f1-8294-be0570e91cd2
+        set subnet 192.168.0.0 255.255.0.0
+    next
+    edit "HUBFG-Lo"
+        set uuid 8f0d1380-e255-51f0-eed5-07133ba4feea
+        set subnet 172.28.255.253 255.255.255.255
+    next
+    edit "HUBFG2-Lo"
+        set uuid ebac9baa-2fbd-51f1-170a-62f0d0963923
+        set subnet 172.28.255.252 255.255.255.255
+    next
+    edit "LAN Subnets"
+        set uuid 60227266-2fbe-51f1-2ab9-0598ae1b07ed
+        set subnet 192.168.93.0 255.255.255.0
+    next
+    edit "Spoke-Loopback"
+        set uuid c36d079c-2fbd-51f1-8908-47eed5469090
+        set subnet 172.28.0.1 255.255.255.255
+    next
+end
+
+SITEFG1 (address) # end
+
+SITEFG1 # config firewall addrgrp
+
+SITEFG1 (addrgrp) # show
+config firewall addrgrp
+    edit "RFC1918"
+        set uuid df1b6062-e254-51f0-0291-09194cb32382
+        set member "RFC1918-10" "RFC1918-192" "RFC198-172"
+    next
+end
+
+SITEFG1 (addrgrp) # config firewall policy
+Unknown action 0
+
+SITEFG1 (addrgrp) # end
+
+SITEFG1 # config firewall policy
+
+SITEFG1 (policy) # show
+config firewall policy
+    edit 1
+        set name "ADVPN"
+        set uuid cb81284e-b265-51f0-15b3-cc2b3f7a7ad9
+        set srcintf "ADVPN" "port4"
+        set dstintf "ADVPN" "port4"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set comments "t"
+    next
+    edit 2
+        set name "Ping->Loopback"
+        set uuid 25213486-b331-51f0-7213-50347fe33814
+        set srcintf "ADVPN"
+        set dstintf "Spoke1-L0"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "Spoke1-L0 address" "HUBFG-Lo" "HUBFG2-Lo" "S
+poke-Loopback"
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+    next
+    edit 3
+        set name "LAN->Internet"
+        set uuid 09963db0-2fbe-51f1-d73d-f8ac8e7dca34
+        set srcintf "port4"
+        set dstintf "INET"
+        set action accept
+        set srcaddr "LAN Subnets"
+        set dstaddr "all"
+        set schedule "always"
+        set service "HTTP" "HTTPS" "PING"
+        set utm-status enable
+        set profile-type group
+        set profile-group "Default-ProfileGroup"
+        set logtraffic all
+        set nat enable
+        set comments "t"
+    next
+end
+
+SITEFG1 (policy) # end
+
+SITEFG1 #
