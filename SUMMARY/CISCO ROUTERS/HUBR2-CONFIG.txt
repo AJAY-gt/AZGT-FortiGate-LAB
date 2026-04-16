@@ -1,0 +1,133 @@
+Building configuration...
+
+Current configuration : 1556 bytes
+!
+version 17.12
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname HUBR2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+!
+!
+!
+clock timezone AEST 10 0
+clock summer-time AEDT recurring last Sun Oct 2:00 last Sun Mar 3:00
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+login on-success log
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+mpls label protocol ldp
+multilink bundle-name authenticated
+!
+!
+!
+!
+cts logging verbose
+!
+memory free low-watermark processor 81225
+!
+!
+spanning-tree mode rapid-pvst
+!
+enable secret 9 $14$8Enp$9JMsI.EIBuUIGE$Xdrk.AdvL3RjuGhn6fXCI6Z51QRo4VLirIuWByqlDb.
+!
+username admin privilege 15 secret 9 $14$anaR$7SUi5WpV4QAHy.$R3WYaWlc6USSarrCXu4z8Gdhjoa51GxX3Gc3oZYzBXg
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.1.1.2 255.255.255.255
+!
+interface Ethernet0/0
+ description TO_SITER2
+ ip address 10.10.20.13 255.255.255.252
+ ip tcp adjust-mss 1360
+ mpls ip
+!
+interface Ethernet0/1
+ description TO_HUBR1
+ ip address 10.10.20.10 255.255.255.252
+ ip tcp adjust-mss 1360
+ mpls ip
+!
+interface Ethernet0/2
+ ip address 10.10.30.13 255.255.255.252
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+router ospf 100
+ router-id 10.1.1.2
+ network 10.1.1.2 0.0.0.0 area 0
+ network 10.10.20.10 0.0.0.0 area 0
+ network 10.10.20.13 0.0.0.0 area 0
+ network 10.10.30.13 0.0.0.0 area 0
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip ssh bulk-mode 131072
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+!
+!
+end
